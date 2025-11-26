@@ -17,9 +17,10 @@ urlpatterns = [
     path('kitchen/update_status/<int:order_id>/', views.update_kitchen_status, name='update_kitchen_status'),
     
     # Admin
-    path('admin/', views.admin_view, name='admin_view'),
-    path('admin/menu/add/', views.add_edit_menu_item, name='add_menu_item'),
-    path('admin/menu/edit/<int:item_id>/', views.add_edit_menu_item, name='edit_menu_item'),
-    path('admin/menu/delete/<int:item_id>/', views.delete_menu_item, name='delete_menu_item'),
-    path('admin/order/update_status/<int:order_id>/', views.update_order_status, name='update_order_status'),
+    path('dashboard/', views.admin_view, name='admin_view'),
+    path('dashboard/menu/add/', views.add_edit_menu_item, name='add_menu_item'),
+    path('dashboard/menu/edit/<int:item_id>/', views.add_edit_menu_item, name='edit_menu_item'),
+    path('dashboard/menu/delete/<int:item_id>/', views.delete_menu_item, name='delete_menu_item'),
+    path('dashboard/order/update_status/<int:order_id>/', views.update_order_status, name='update_order_status'),
+
 ]
