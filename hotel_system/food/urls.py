@@ -4,6 +4,7 @@ from . import views
 urlpatterns = [
     # Login/Logout
     path('', views.login_view, name='login'),
+    path('admin_login', views.admin_chef_login_view, name='admin_login'),
     path('logout/', views.logout_view, name='logout'),
     
     # Customer
@@ -22,5 +23,4 @@ urlpatterns = [
     path('dashboard/menu/edit/<int:item_id>/', views.add_edit_menu_item, name='edit_menu_item'),
     path('dashboard/menu/delete/<int:item_id>/', views.delete_menu_item, name='delete_menu_item'),
     path('dashboard/order/update_status/<int:order_id>/', views.update_order_status, name='update_order_status'),
-
 ]

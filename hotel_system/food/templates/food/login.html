@@ -3,8 +3,10 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
+<div class="min-h-screen flex items-center justify-center bg-cover bg-center bg-gray-100" 
+     style="background-image: url('/static/images/your-background.jpg');">
+
+    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4">
         <h1 class="text-4xl font-bold text-center mb-2 text-gray-800">Hotel Deluxe</h1>
         <p class="text-center text-gray-600 mb-8">Food Ordering System</p>
         
@@ -29,4 +31,8 @@
         </form>
     </div>
 </div>
+
+<script>
+    lucide.createIcons();
+</script>
 {% endblock %}

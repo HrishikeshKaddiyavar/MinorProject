@@ -32,8 +32,29 @@ def login_view(request):
             # Start a new cart for the customer session
             if role == 'customer':
                 request.session['cart'] = {}
+            if role == 'kitchen':
+                return redirect('/admin_login')
+            if role == 'admin':
+                return redirect('/admin_login')
             return redirect(f'/{role}/') # Redirect to role-specific dashboard
     return render(request, 'food/login.html')
+
+def admin_chef_login_view(request):
+    context = {'login_verified' : True}
+    if request.method == 'POST':
+        role = request.POST.get('role')
+        if role == 'customer':
+            return redirect('/customer/')
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        if username == 'chef' and password == 'chef123':
+            return redirect('/kitchen/')
+        
+        if username == 'admin' and password == 'admin123':
+            return redirect('/dashboard/')
+        context = {'login_verified' : False}
+    return render(request, 'food/admin_chef_login.html', context)
 
 def logout_view(request):
     """Logs out the user."""

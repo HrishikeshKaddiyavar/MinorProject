@@ -13,7 +13,7 @@
         <div class="bg-gray-800 text-white p-3">
             <div class="max-w-6xl mx-auto flex justify-between items-center">
                 <div class="flex gap-4">
-                    <a href="{% url 'customer_view' %}" class="px-4 py-2 rounded {% if request.session.user_role == 'customer' %}bg-gray-700{% endif %}">
+                    <!-- <a href="{% url 'customer_view' %}" class="px-4 py-2 rounded {% if request.session.user_role == 'customer' %}bg-gray-700{% endif %}">
                         Customer
                     </a>
                     <a href="{% url 'kitchen_view' %}" class="px-4 py-2 rounded {% if request.session.user_role == 'kitchen' %}bg-gray-700{% endif %}">
@@ -21,10 +21,10 @@
                     </a>
                     <a href="{% url 'admin_view' %}" class="px-4 py-2 rounded {% if request.session.user_role == 'admin' %}bg-gray-700{% endif %}">
                         Admin
-                    </a>
+                    </a> -->
                 </div>
-                <a href="{% url 'logout' %}" class="px-4 py-2 bg-red-600 rounded hover:bg-red-700">
-                    Logout
+                <a href="{% url 'admin_login' %}" class="px-4 py-2 bg-red-600 rounded hover:bg-red-700">
+                    Login
                 </a>
             </div>
         </div>
