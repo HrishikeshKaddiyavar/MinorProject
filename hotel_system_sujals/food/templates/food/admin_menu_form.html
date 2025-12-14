@@ -1,0 +1,100 @@
+{% extends "food/base.html" %}
+
+{% block title %}{% if item %}Edit{% else %}Add{% endif %} Menu Item{% endblock %}
+
+{% block content %}
+<div class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl p-6 max-w-md w-full">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-bold">{% if item %}Edit Item: {{ item.name }}{% else %}Add New Menu Item{% endif %}</h3>
+            <a href="{% url 'admin_view' %}" class="text-gray-500 hover:text-gray-700">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </a>
+        </div>
+        
+        <form method="POST" action="{{ action_url }}">
+            {% csrf_token %}
+            <div class="space-y-4">
+                <input
+                    type="text"
+                    name="name"
+                    placeholder="Item Name"
+                    value="{{ item.name|default:'' }}"
+                    required
+                    class="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500"
+                />
+                <select
+                    name="category"
+                    class="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500"
+                    required
+                >
+                    {% for cat in categories %}
+                        <option value="{{ cat.name }}" {% if item.category.name == cat.name %}selected{% endif %}>
+                            {{ cat.name }}
+                        </option>
+                    {% endfor %}
+                    <option value="New Category">-- Add New Category --</option> 
+                </select>
+                <input
+                    type="number"
+                    name="price"
+                    placeholder="Price (e.g., 350.00)"
+                    value="{{ item.price|default:'' }}"
+                    step="0.01"
+                    required
+                    class="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500"
+                />
+
+
+                <input
+                    type="text"
+                    name="image"
+                    placeholder="Image filename (e.g. samosa.jpg)"
+                    value="{{ item.image|default:'' }}"
+                    class="w-full p-2 border rounded"
+                />
+
+                <!-- <input
+                    type="text"
+                    name="image"
+                    placeholder="Emoji (e.g., 🍕)"
+                    value="{{ item.image|default:'🍽' }}"
+                    class="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500"
+                /> -->
+                <textarea
+                    name="description"
+                    placeholder="Description"
+                    class="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500"
+                    rows="2"
+                >{{ item.description|default:'' }}</textarea>
+                
+                <div class="flex items-center gap-2">
+                    <input
+                        type="checkbox"
+                        name="available"
+                        id="available"
+                        {% if item.available or not item %}checked{% endif %}
+                        class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <label for="available" class="text-gray-700">Available on Menu</label>
+                </div>
+                
+                <div class="flex gap-2 pt-4">
+                    <button
+                        type="submit"
+                        class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+                    >
+                        Save Item
+                    </button>
+                    <a
+                        href="{% url 'admin_view' %}"
+                        class="flex-1 text-center bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400 transition"
+                    >
+                        Cancel
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
