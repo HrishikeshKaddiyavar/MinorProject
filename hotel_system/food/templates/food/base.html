@@ -7,6 +7,7 @@
     <title>Hotel Deluxe - {% block title %}{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="icon" type="image/png" href="{% static 'food/favicon_icon.png' %}">
 </head>
 <body class="bg-gray-50 min-h-screen">
     {% if request.session.user_role %}
