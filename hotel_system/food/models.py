@@ -13,6 +13,11 @@ class MenuItem(models.Model):
     price = models.DecimalField(max_digits=6, decimal_places=2)
     image = models.CharField(max_length=10, default='🍽')
     description = models.TextField()
+    menu_quantity = models.DecimalField(
+        max_digits=6,
+        decimal_places=0,
+        default=1
+    )   
     available = models.BooleanField(default=True)
 
     def __str__(self):

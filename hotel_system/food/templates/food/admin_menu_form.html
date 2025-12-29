@@ -40,8 +40,8 @@
                     name="price"
                     placeholder="Price (e.g., 350.00)"
                     value="{{ item.price|default:'' }}"
-                    step="0.01"
                     required
+                    min="1"
                     class="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500"
                 />
 
@@ -67,6 +67,16 @@
                     class="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500"
                     rows="2"
                 >{{ item.description|default:'' }}</textarea>
+
+                <input
+                    type="number"
+                    name="menu_quantity"
+                    placeholder="Quantity"
+                    value="{{ item.menu_quantity|default:'' }}"
+                    required
+                    min="0"
+                    class="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500"
+                />
                 
                 <div class="flex items-center gap-2">
                     <input

@@ -69,39 +69,55 @@ def check_role(request, required_role):
     return request.session.get('user_role') == required_role
 
 # --- Customer Views ---
+
 def customer_view(request):
     if not check_role(request, 'customer'):
         return redirect('login')
 
     search_query = request.GET.get('search', '')
     category_slug = request.GET.get('category', 'all')
-    
-    menu_items = MenuItem.objects.filter(available=True)
-    
+
+    # ✅ Correct Django ORM filtering
+    menu_items = MenuItem.objects.filter(
+        available=True,
+    )
+
     if category_slug != 'all':
         menu_items = menu_items.filter(category__name=category_slug)
-        
+
     if search_query:
         menu_items = menu_items.filter(name__icontains=search_query)
 
     context = {
-        'menu_items': menu_items,
+        'menu_items_dict': menu_items,   # queryset (not dict)
         'categories': Category.objects.all(),
         'selected_category': category_slug,
         'search_query': search_query,
         'cart': get_cart(request),
         'cart_total': get_cart_total(request),
     }
+
     return render(request, 'food/customer_view.html', context)
+
 
 @require_POST
 def add_to_cart(request, item_id):
     if not check_role(request, 'customer'):
         return redirect('login')
-        
+
     menu_item = get_object_or_404(MenuItem, pk=item_id)
+
+    if not menu_item.available or menu_item.menu_quantity < 1:
+        return redirect('customer_view')
+
     cart = get_cart(request)
     item_id_str = str(item_id)
+
+    current_qty = cart.get(item_id_str, {}).get('quantity', 0)
+
+    # HARD LIMIT CHECK
+    if current_qty >= int(menu_item.menu_quantity):
+        return redirect('customer_view')
 
     if item_id_str in cart:
         cart[item_id_str]['quantity'] += 1
@@ -113,30 +129,36 @@ def add_to_cart(request, item_id):
             'image': menu_item.image,
             'quantity': 1,
         }
-        
+
     save_cart(request, cart)
-    # Redirect back to the menu view
-    return redirect(request.META.get('HTTP_REFERER', 'customer_view')) 
+    return redirect(request.META.get('HTTP_REFERER', 'customer_view'))
 
 @require_POST
 def update_cart(request, item_id):
     if not check_role(request, 'customer'):
         return redirect('login')
-        
+
     action = request.POST.get('action')
     cart = get_cart(request)
     item_id_str = str(item_id)
 
-    if item_id_str in cart:
-        if action == 'increment':
+    if item_id_str not in cart:
+        return redirect('customer_view')
+
+    menu_item = get_object_or_404(MenuItem, pk=item_id)
+
+    if action == 'increment':
+        if cart[item_id_str]['quantity'] < int(menu_item.menu_quantity):
             cart[item_id_str]['quantity'] += 1
-        elif action == 'decrement':
-            cart[item_id_str]['quantity'] -= 1
-            if cart[item_id_str]['quantity'] <= 0:
-                del cart[item_id_str]
-        elif action == 'remove':
+
+    elif action == 'decrement':
+        cart[item_id_str]['quantity'] -= 1
+        if cart[item_id_str]['quantity'] <= 0:
             del cart[item_id_str]
-            
+
+    elif action == 'remove':
+        del cart[item_id_str]
+
     save_cart(request, cart)
     return redirect('customer_view')
 
@@ -147,27 +169,20 @@ def place_order(request):
 
     cart = get_cart(request)
     if not cart:
-        print("DEBUG: Cart empty")
         return redirect('customer_view')
 
     table_input = request.POST.get('table_no')
-    print("DEBUG: table_no =", table_input)
-
     if not table_input or not table_input.isdigit():
-        print("DEBUG: Invalid table number")
         return redirect('customer_view')
 
     total = get_cart_total(request)
-    print("DEBUG: total =", total)
 
     order = Order.objects.create(
         total=total,
         table_no=int(table_input)
     )
 
-    print("DEBUG: Order created with ID =", order.order_id)
-
-    for item_id_str, item_data in cart.items():
+    for item_data in cart.values():
         menu_item = get_object_or_404(MenuItem, pk=item_data['id'])
 
         OrderItem.objects.create(
@@ -177,7 +192,9 @@ def place_order(request):
             price_at_order=item_data['price'],
         )
 
-        print("DEBUG: OrderItem added:", menu_item.name)
+        # OPTIONAL (recommended): reduce stock
+        menu_item.menu_quantity -= item_data['quantity']
+        menu_item.save()
 
     request.session['cart'] = {}
 
@@ -249,6 +266,7 @@ def add_edit_menu_item(request, item_id=None):
         price = request.POST.get('price')
         image = request.POST.get('image')
         description = request.POST.get('description')
+        menu_quantity = request.POST.get('menu_quantity')
         available = request.POST.get('available') == 'on'
 
         category, created = Category.objects.get_or_create(name=category_name)
@@ -261,12 +279,13 @@ def add_edit_menu_item(request, item_id=None):
             item.image = image
             item.description = description
             item.available = available
+            item.menu_quantity = menu_quantity
             item.save()
         else:
             # Add new item
             MenuItem.objects.create(
                 name=name, category=category, price=price, image=image, 
-                description=description, available=available
+                description=description, menu_quantity = menu_quantity, available=available
             )
         return redirect('admin_view')
 
